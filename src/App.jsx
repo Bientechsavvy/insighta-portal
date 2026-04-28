@@ -8,6 +8,14 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Add token to every request
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 export default function App() {
   const [user, setUser] = useState(null);
   const [profiles, setProfiles] = useState([]);
@@ -18,8 +26,15 @@ export default function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchMe();
-  }, []);
+  // Check if we just came back from GitHub OAuth
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('access_token');
+  if (token) {
+    localStorage.setItem('access_token', token);
+    window.history.replaceState({}, '', '/');
+  }
+  fetchMe();
+}, []);
 
   useEffect(() => {
     if (user) fetchProfiles();
@@ -70,9 +85,9 @@ export default function App() {
     setProfiles([]);
   }
 
-  function handleLogin() {
-    window.location.href = `${API}/auth/github`;
-  }
+ function handleLogin() {
+  window.location.href = `http://35.180.66.115:3000/api/v1/auth/github`;
+}
 
   if (!user) {
     return (
