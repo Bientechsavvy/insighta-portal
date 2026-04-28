@@ -6,6 +6,9 @@ const API = 'http://35.180.66.115:3000/api/v1';
 const api = axios.create({
   baseURL: API,
   withCredentials: true,
+  headers: {
+    'X-API-Version': '1',
+  },
 });
 
 // Add token to every request
